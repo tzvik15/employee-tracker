@@ -1,0 +1,25 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "a command-line app that uses SQL to track employees",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tzvik15/employee-tracker.git"
+  },
+  "author": "Daniel Nester",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tzvik15/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/tzvik15/employee-tracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.0.0",
+    "mysql": "^2.17.1"
+  }
+}
