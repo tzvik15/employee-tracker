@@ -1,10 +1,9 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require('console.table');
-//const {start} = require("./functions.js");
 const express = require("express");
-const fs = require("fs");
 
+require('dotenv').config();
 
 //dotenv 
 
@@ -15,18 +14,17 @@ var PORT = process.env.PORT || 8080;
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
-  user: "root",
-  password: "",
+  user: process.env.SQL_USER,
+  password: process.env.SQL_PASSWORD,
   database: "employees_DB"
 });
 
-// connect to the mysql server and sql database
+// connect to the mysql server and sql database, launches menu function
 connection.connect(function(err) {
   if (err) throw err;
+
   menu();
 });
-
-
 
 //the main menu of the app. User choice dictates which function will fire.
 const menu=()=> {
@@ -93,6 +91,21 @@ viewDepartments =()=> {
   //departmentSelect();
 })}
 
+//add an employee
+addEmployee=()=>{
+  inquirer.prompt([{
+    type:"input",
+    name:"firstName",
+    message: "What is the first name of the employy you want to add?"
+  },
+{
+  type:"input",
+  name: "lastName",
+  message: "What is the last name of the employee?"
+},{
+  
+}])
+}
 
 
 
@@ -100,11 +113,9 @@ viewDepartments =()=> {
 
 
 
-//start();
 
 
 app.listen(PORT, function() {
     console.log("App listening on PORT " + PORT);
   });
 
-  //module.exports = connection;
