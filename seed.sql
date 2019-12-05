@@ -1,29 +1,12 @@
-DROP DATABASE IF EXISTS employees_db;
+INSERT INTO employee(first_name,last_name,role_id,manager_id) 
+VALUES("Bob","Robertson",1,NULL);
 
-CREATE DATABASE employees_db;
+INSERT INTO roles(dep_name,title,salary,department_id)
+VALUES("seed department","seeder",10000,1);
+INSERT INTO roles(dep_name,title,salary,department_id)
+VALUES("seed department","feeder",20000,1);
+INSERT INTO roles(dep_name,title,salary,department_id)
+VALUES("seed department","meeder",30000,1);
 
-USE employees_db;
-
-CREATE TABLE department(
-    id INTEGER AUTO_INCREMENT NOT NULL,
-    dep_name VARCHAR(30),
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE roles(
-    id INTEGER AUTO_INCREMENT NOT NULL,
-    dep_name VARCHAR(30),
-    title VARCHAR(30),
-    salary DECIMAL,
-    department_id INT, 
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE employee(
-    id - INTEGER AUTO_INCREMENT NOT NULL, 
-    first_name - VARCHAR(30),
-    last_name - VARCHAR(30),
-    role_id - INTEGER NOT NULL,
-    manager_id - INTEGER,
-    PRIMARY KEY (id)
-);
+INSERT INTO department(dep_name)
+VALUES("seed department");

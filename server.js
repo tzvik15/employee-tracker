@@ -93,6 +93,11 @@ viewDepartments =()=> {
 
 //add an employee
 addEmployee=()=>{
+  connection.query("SELECT * FROM roles", function(err,res){
+    if (err) throw err;
+  
+
+
   inquirer.prompt([{
     type:"input",
     name:"firstName",
@@ -103,8 +108,52 @@ addEmployee=()=>{
   name: "lastName",
   message: "What is the last name of the employee?"
 },{
-  
-}])
+  type:"list",
+  name: "role",
+  message:"what role does this employee have?",
+  choices: function() {
+    let roleArray =[];
+    for (let i=0; i<res.length; i++) {
+      
+      roleArray.push(res[i].title);
+    }
+    //console.log(res.id);
+    return roleArray;
+  }
+},{
+  type:"number",
+  name:"manager",
+  message:"What is the id number of the manager?"
+}
+]).then(function(answers){
+//make a loop going through res
+//condition equality with role name
+//if role name === answer.name pull role.id into variable
+//make role_id = the new variable
+
+
+  // let test = answers.role;
+  // let id = connection.query("SELECT roles.id FROM roles INNER JOIN employee ON  roles.title =?", test)
+  // console.log(id);
+  connection.query(
+    "INSERT INTO employee SET ?",
+    {
+      first_name: answers.firstName,
+      last_name: answers.lastName,
+      role_id: answers.id
+    },
+    function(err, res) {
+      if (err) throw err;
+      console.log(res.affectedRows + " product inserted!\n");
+      
+  //   }
+  // );
+
+})
+
+
+
+})
 }
 
 
