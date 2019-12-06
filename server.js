@@ -73,7 +73,6 @@ viewEmployees = () => {
   let query = "SELECT * FROM employee";
   connection.query(query, function(err, res) {
     if (err) throw err;
-    console.log("test");
     console.log(res.length + " employees found!");
     console.table("All Employees:", res);
     next();
@@ -184,41 +183,171 @@ const next = () => {
         menu();
       } else {
         console.log("Thank you for using this application. Good bye!");
-        connection.end();
+        finish();
       }
     });
 };
 
-addDepartment =()=> {
+addDepartment = () => {
   inquirer
-  .prompt([{
-    type:"input",
-    name:"newDep",
-    message:"What is the name of the new department?"
-  }]).then(function(res){
-    connection.query(
-      "INSERT INTO department SET ?",
+    .prompt([
       {
-        dep_name: res.newDep
-      },
-      function(err, res) {
-        if (err) throw err;
-        console.log("here are all the current departments: ");
-        viewDepartments();
+        type: "input",
+        name: "newDep",
+        message: "What is the name of the new department?"
       }
-  )})
-}
+    ])
+    .then(function(res) {
+      connection.query(
+        "INSERT INTO department SET ?",
+        {
+          dep_name: res.newDep
+        },
+        function(err, res) {
+          if (err) throw err;
+          console.log("here are all the current departments: ");
+          viewDepartments();
+        }
+      );
+    });
+};
 
+addRoles = () => {
+  connection.query("SELECT * FROM department", function(err, res) {
+    if (err) throw err;
 
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "roleName",
+          message: "What is the name of the role you want to add?"
+        },
+        {
+          type: "input",
+          name: "pay",
+          message: "How much does this role pay?"
+        },
+        {
+          type: "list",
+          name: "depName",
+          message: "Which department would you like to add the role to?",
+          //loops and displays all existing roles for selection
+          choices: function() {
+            let depArray = [];
+            for (let i = 0; i < res.length; i++) {
+              depArray.push(res[i].dep_name);
+            }
+            return depArray;
+          }
+        }
+      ])
+      .then(function(answers) {
+        //loops through the original response, this time comparing the name of the department with the selected department from the inquirer. When a match is found, grabs the department ID from the res object.
+        let depID;
+        for (let j = 0; j < res.length; j++) {
+          if (res[j].dep_name == answers.depName) {
+            depID = res[j].id;
+          }
+        }
+        //adds the new role to the roles table, display the new roles table, launches "next" function.
+        connection.query(
+          "INSERT INTO roles SET ?",
+          {
+            dep_name: answers.depName,
+            title: answers.roleName,
+            salary: answers.pay,
+            department_id: depID
+          },
+          function(err, res) {
+            if (err) throw err;
+            console.log("here are all the current roles: ");
+            viewRoles();
+          }
+        );
+      });
+  });
+};
+//a function that allows the user to update an existing employee's role.
+updateEmployee = () => {
+  connection.query(
+    "SELECT * FROM roles, employee WHERE roles.id = employee.role_id",
+    function(err, res) {
+      if (err) throw err;
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "selected",
+            message: "The role of which employee would you like to edit?",
+            choices: function() {
+              let empArray = [];
+              for (let i = 0; i < res.length; i++) {
+                empArray.push(res[i].first_name + " " + res[i].last_name);
+              }
 
+              let uniqueNames = empArray =>
+                empArray.filter((v, i) => empArray.indexOf(v) === i);
 
+              return uniqueNames(empArray);
+            }
+          },
+          {
+            type: "list",
+            name: "newRole",
+            message: "Which role would you like to assign?",
+            choices: function() {
+              let roleArray = [];
+              for (let i = 0; i < res.length; i++) {
+                roleArray.push(res[i].title);
+              }
+              let uniqueRoles = roleArray =>
+                roleArray.filter((v, i) => roleArray.indexOf(v) === i);
+              return uniqueRoles(roleArray);
+            }
+          }
+        ])
+        .then(function(answer) {
+          //compares the title from the original response (the combined table) with the selected new role to determine the new role id
+          let newRoleID;
+          for (let j = 0; j < res.length; j++) {
+            if (res[j].title == answer.newRole) {
+              newRoleID = res[j].role_id;
+            }
+          }
+          //creates seperate variables for employee first and last name by splitting the array:in the table, first and last name are seperate columns.
+          let newEmpArr = answer.selected.split(" ");
+          let empFirst = newEmpArr[0];
+          let empLast = newEmpArr[1];
+          //updates the employee table, uses employee first and last names to determine the update condition, assigns the new role id.
+          connection.query(
+            "UPDATE employee SET  ? WHERE ? AND ?",
+            [
+              {
+                role_id: newRoleID
+              },
+              {
+                first_name: empFirst
+              },
+              {
+                last_name: empLast
+              }
+            ],
+            function(err, res) {
+              if (err) throw err;
 
+              console.log("here is the updated employee chart:");
+              viewEmployees();
+            }
+          );
+        });
+    }
+  );
+};
 
-
-
-
-
-
+const finish = () => {
+  connection.destroy();
+};
 
 app.listen(PORT, function() {
   console.log("App listening on PORT " + PORT);
