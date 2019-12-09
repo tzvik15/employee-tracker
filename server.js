@@ -1,13 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-const express = require("express");
 
 require("dotenv").config();
-
-//dotenv
-
-const app = express();
 
 var PORT = process.env.PORT || 8080;
 
@@ -22,7 +17,6 @@ var connection = mysql.createConnection({
 // connect to the mysql server and sql database, launches menu function
 connection.connect(function(err) {
   if (err) throw err;
-
   menu();
 });
 
@@ -76,7 +70,6 @@ viewEmployees = () => {
     console.log(res.length + " employees found!");
     console.table("All Employees:", res);
     next();
-    //employeeSelect();
   });
 };
 
@@ -88,7 +81,6 @@ viewRoles = () => {
     console.log(res.length + " roles found!");
     console.table("All Roles:", res);
     next();
-    //roleSelect();
   });
 };
 
@@ -100,7 +92,6 @@ viewDepartments = () => {
     console.log(res.length + " departments found!");
     console.table("All Departments:", res);
     next();
-    //departmentSelect();
   });
 };
 
@@ -345,10 +336,6 @@ updateEmployee = () => {
   );
 };
 
-const finish = () => {
-  connection.destroy();
-};
-
-app.listen(PORT, function() {
-  console.log("App listening on PORT " + PORT);
-});
+async function finish() {
+  connection.end();
+}
